@@ -12,6 +12,7 @@ namespace BL.Models
             this.Description = taskModel.Description;
             this.Url = taskModel.Url;
             this.Email = taskModel.Email;
+            this.Header = taskModel.Header;
             this.Cron = taskModel.CronFormat.ConvertToCronModel();
         }
 
@@ -24,6 +25,8 @@ namespace BL.Models
         public string Url { get; set; }
 
         public string Email { get; set; }
+
+        public string Header { get; set; }
 
         public CronModel Cron { get; set; }
     }

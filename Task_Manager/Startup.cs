@@ -47,7 +47,7 @@ namespace Task_Manager
                 opts.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<RepositoryContext>();
 
-            
+
 
             var jwtSettings = Configuration.GetSection("JwtSettings");
             services.AddAuthentication(opt =>
@@ -75,15 +75,14 @@ namespace Task_Manager
 
             services.AddSingleton(emailConfig);
             services.AddHttpClient();
-            services.AddScoped<IEmailSender, EmailSender>();
+
             services.AddScoped<JwtHandler>();
-            services.AddScoped<IWeatherProcessor, WeatherProcessor>();
             services.AddScoped<ITaskManager, TaskManager>();
-            services.AddScoped<ISenderManager, SenderManager>();
+   
             services.AddAutoMapper(typeof(Startup));
 
             services.AddSchedulerDependencies();
-            
+
             services.AddControllers();
         }
 
@@ -93,7 +92,7 @@ namespace Task_Manager
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-            }           
+            }
             app.UseStaticFiles();
 
             app.UseSwagger();
@@ -118,9 +117,9 @@ namespace Task_Manager
 
             app.UseEndpoints(endpoints =>
             {
-                
+
                 endpoints.MapControllers();
             });
-        }          
+        }
     }
 }

@@ -1,4 +1,9 @@
-﻿using BL.Scheduler.Managers;
+﻿using ApiServices.ApiService;
+using ApiServices.ApiService.Interfaces;
+using ApiServices.EmailService;
+using BL.Managers;
+using BL.Managers.Interfaces;
+using BL.Scheduler.Managers;
 using BL.Scheduler.Managers.Interfaces;
 using BL.Scheduler.MemoryDatabase;
 using BL.Scheduler.Services;
@@ -13,9 +18,13 @@ namespace BL.Scheduler
             services.AddHostedService<TaskSyncService>();
 
             services.AddScoped<ISyncDatabaseManager, SyncDatabaseManager>();
+            services.AddTransient<ISenderManager, SenderManager>();
+            services.AddTransient<IWeatherProcessor, WeatherProcessor>();
+            services.AddTransient<IFileManager, FileManager>();
+            services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddSingleton<ITaskCollection, TaskCollection>();
-            //services.AddSingleton<IJobPooling, JobPooling>();
+            services.AddSingleton<IJobPooling, JobPooling>();
         }
     }
 }

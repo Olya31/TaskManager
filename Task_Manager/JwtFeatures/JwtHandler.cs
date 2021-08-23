@@ -12,7 +12,7 @@ using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Task_Manager.JwtFeatures
 {
-    public class JwtHandler
+    public sealed class JwtHandler
     {
         private readonly IConfiguration _configuration;
         private readonly IConfigurationSection _jwtSettings;
@@ -50,7 +50,9 @@ namespace Task_Manager.JwtFeatures
             return claims;
         }
 
-        public JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, IEnumerable<Claim> claims)
+        public JwtSecurityToken GenerateTokenOptions(
+            SigningCredentials signingCredentials,
+            IEnumerable<Claim> claims)
         {
             var tokenOptions = new JwtSecurityToken(
                 issuer: _jwtSettings.GetSection("validIssuer").Value,

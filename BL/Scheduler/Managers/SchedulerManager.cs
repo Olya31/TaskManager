@@ -1,6 +1,5 @@
 ﻿using BL.Managers.Interfaces;
 using BL.Models;
-using BL.Scheduler.Managers.Interfaces;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +11,7 @@ namespace BL.Scheduler.Managers
         private readonly CancellationTokenSource _cancellationTokenSource;
         private Task _task;
         private JobModel _job;
+        public bool IsRunning;
 
         public Task JobTask => _task;
 
@@ -65,9 +65,11 @@ namespace BL.Scheduler.Managers
         {
             while (!cancellationToken.IsCancellationRequested)
             {
+                IsRunning = true;
+
                 try
                 {
-                    await senderManager.SendAsync(_job.Url, _job.Email, cancellationToken);
+                    await senderManager.SendAsync(_job.Url, _job.Email, _job.Header, cancellationToken);
                     semaphoreSlim.Release();
                 }
                 catch (OperationCanceledException)

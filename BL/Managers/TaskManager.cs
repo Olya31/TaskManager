@@ -142,7 +142,7 @@ namespace BL.Managers
                             }
                             catch (Exception ex)
                             {
-                                throw new Exception();
+                                throw;
                             }
                         }
                     }

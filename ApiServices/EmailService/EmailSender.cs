@@ -29,11 +29,15 @@ namespace ApiServices.EmailService
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
 
-            var bodyBuilder = new BodyBuilder { HtmlBody = string.Format("<h2 style='color:black;'>{0}</h2>", message.Content) };
+            var bodyBuilder = new BodyBuilder 
+            { 
+                HtmlBody = string.Format("<h2 style='color:black;'>{0}</h2>", message.Content),
+            };
 
-            if (message.Attachments != null && message.Attachments.Any())
+            if (message.Attachments?.Any() == true)
             {
                 byte[] fileBytes;
+
                 foreach (var attachment in message.Attachments)
                 {
                     using (var ms = new MemoryStream())
@@ -42,17 +46,22 @@ namespace ApiServices.EmailService
                         fileBytes = ms.ToArray();
                     }
 
-                    bodyBuilder.Attachments.Add(attachment.FileName, fileBytes, ContentType.Parse(attachment.ContentType));
+                    bodyBuilder.Attachments.Add(
+                        attachment.FileName,
+                        fileBytes,
+                        ContentType.Parse(attachment.ContentType));
                 }
             }
 
             emailMessage.Body = bodyBuilder.ToMessageBody();
+
             return emailMessage;
         }
 
         private async Task SendAsync(MimeMessage mailMessage)
         {
             using var client = new SmtpClient();
+
             try
             {
                 await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, true);

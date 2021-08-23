@@ -34,10 +34,14 @@ namespace BL.Scheduler.Managers
         private async Task RunJobsAsync(CancellationToken token)
         {
             var ss = new SemaphoreSlim(3); // thread count
+
             foreach (var job in _jobs)
             {
-                await ss.WaitAsync(token);
-                job.Value.Start(_senderManager, ss, token);
+                if (!job.Value.IsRunning)
+                {
+                    await ss.WaitAsync(token);
+                    job.Value.Start(_senderManager, ss, token);
+                }
             }
         }
 
