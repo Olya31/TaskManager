@@ -2,6 +2,9 @@
 using BL.Models;
 using BL.Scheduler.Managers.Interfaces;
 using BL.Scheduler.MemoryDatabase;
+using Entities.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +26,30 @@ namespace BL.Scheduler.Managers
         public async Task SyncSchedulerTasksAsync(CancellationToken cancellationToken)
         {
             var tasks = await _taskManager.GetAllTaskAsync(cancellationToken);
-            
+
+            await AddTasksAsync(tasks, cancellationToken);
+            await RemoveTasksAsync(tasks, cancellationToken);
+        }
+
+        private async Task RemoveTasksAsync(
+            IEnumerable<TaskModel> tasks,
+            CancellationToken cancellationToken)
+        {
+            var jobs = await _taskCollection.GetJobsAsync(cancellationToken);
+
+            foreach (var job in jobs)
+            {
+                if (!tasks.Any(c => job.Id == c.Id))
+                {
+                    await _taskCollection.TryRemoveAsync(job, cancellationToken);
+                }
+            }
+        }
+
+        private async Task AddTasksAsync(
+            IEnumerable<TaskModel> tasks,
+            CancellationToken cancellationToken)
+        {
             foreach (var task in tasks)
             {
                 var job = new JobModel(task);

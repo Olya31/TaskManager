@@ -1,9 +1,9 @@
 ﻿using ApiServices.ApiService.Interfaces;
 using ApiServices.EmailService;
 using BL.Managers.Interfaces;
+using BL.Models;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,37 +13,37 @@ namespace BL.Managers
     {
         private readonly IEmailSender _emailSender;
         private readonly IWeatherProcessor _weatherProcessor;
-        private readonly IFileManager _fileManager;
 
         public SenderManager(
             IEmailSender emailSender,
-            IWeatherProcessor weatherProcessor,
-            IFileManager fileManager)
+            IWeatherProcessor weatherProcessor)
         {
             _emailSender = emailSender;
             _weatherProcessor = weatherProcessor;
-            _fileManager = fileManager;
         }
 
-        public async Task SendAsync(
-            string url,
-            string email,
-            string header,
-            CancellationToken token)
+        public async Task SendAsync(JobModel job, CancellationToken token)
         {
             const string Subject = "Weather";
 
-            var weather = await _weatherProcessor.LoadWeatherInformation(url, header, token);
-            using var file = _fileManager.ExportToCsv(weather);
+            var weather = await _weatherProcessor.LoadWeatherInformation(job.Url, job.Header, token);
+            using var stream = GenerateStreamFromString(weather);
 
-            IReadOnlyList<IFormFile> attachments = new List<FormFile>
-            {
-                new FormFile(file, 0, file.Length, Subject, Subject),
-            };
+            var file = new FormFile(stream, 0, stream.Length, Subject, Subject);
 
-            var message = new Message(new[] { email }, Subject, string.Empty, (IFormFileCollection)attachments);
+            var message = new Message(new[] { job.Email }, job.Name, job.Description, file);
 
             await _emailSender.SendEmailAsync(message);
+        }
+
+        public static Stream GenerateStreamFromString(string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
         }
     }
 }

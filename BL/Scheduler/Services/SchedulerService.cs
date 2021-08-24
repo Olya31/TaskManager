@@ -25,10 +25,17 @@ namespace BL.Scheduler.Services
         {
             _logger.LogInformation($"Startign {nameof(SchedulerService)}");
 
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                await LoopAsync(stoppingToken);
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    await LoopAsync(stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.Message);
             }
 
             _logger.LogInformation($"Finishing {nameof(SchedulerService)}");

@@ -3,7 +3,6 @@ using BL.Models;
 using BL.Scheduler.Managers.Interfaces;
 using BL.Scheduler.MemoryDatabase;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,18 +27,18 @@ namespace BL.Scheduler.Managers
         public async Task StartAsync(CancellationToken token)
         {
             await SyncJobsAsyc(token);
-            await RunJobsAsync(token);
+            StartJobs(token);
+            await StopJobsAsync(token);
         }
 
-        private async Task RunJobsAsync(CancellationToken token)
+        private void StartJobs(CancellationToken token)
         {
             var ss = new SemaphoreSlim(3); // thread count
 
             foreach (var job in _jobs)
             {
-                if (!job.Value.IsRunning)
+                if (job.Value.JobTask.Status == TaskStatus.Created)
                 {
-                    await ss.WaitAsync(token);
                     job.Value.Start(_senderManager, ss, token);
                 }
             }
@@ -59,16 +58,16 @@ namespace BL.Scheduler.Managers
             }
         }
 
-        public void Stop(CancellationToken token)
+        private async Task StopJobsAsync(CancellationToken token)
         {
-            var tasks = new List<Task>();
-
-            foreach (var job in _jobs)
+            foreach (var job in _jobs) 
             {
-                tasks.Add(job.Value.Stop());
+                if (!(await _taskCollection.ContainsJobAsync(job.Key, token)))
+                {
+                    _ = job.Value.Stop();
+                    _jobs.TryRemove(job.Key, out var _);
+                }
             }
-
-            Task.WaitAll(tasks.ToArray(), token);
         }
     }
 }

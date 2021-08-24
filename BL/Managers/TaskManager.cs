@@ -26,7 +26,7 @@ namespace BL.Managers
         {
             var sqlExpression = String.Format(
                 "INSERT INTO Tasks " +
-                "(Name, Description, Url, CronFormat, Email, Headers)" +
+                "(Name, Description, Url, CronFormat, Email, Header)" +
                 " VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')", 
                 task.Name, 
                 task.Description, 

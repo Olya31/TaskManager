@@ -11,7 +11,6 @@ namespace BL.Scheduler.Managers
         private readonly CancellationTokenSource _cancellationTokenSource;
         private Task _task;
         private JobModel _job;
-        public bool IsRunning;
 
         public Task JobTask => _task;
 
@@ -65,18 +64,21 @@ namespace BL.Scheduler.Managers
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                IsRunning = true;
-
                 try
                 {
-                    await senderManager.SendAsync(_job.Url, _job.Email, _job.Header, cancellationToken);
+                    await semaphoreSlim.WaitAsync(cancellationToken);
+
+                    await senderManager.SendAsync(_job, cancellationToken);
+
                     semaphoreSlim.Release();
                 }
                 catch (OperationCanceledException)
                 {
+                    throw;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    throw;
                 }
 
                 await Task.Delay(_job.Cron.Minutes, cancellationToken);

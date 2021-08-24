@@ -16,11 +16,11 @@ namespace BL.Scheduler
         public static void AddSchedulerDependencies(this IServiceCollection services)
         {
             services.AddHostedService<TaskSyncService>();
+            services.AddHostedService<SchedulerService>();
 
-            services.AddScoped<ISyncDatabaseManager, SyncDatabaseManager>();
+            services.AddTransient<ISyncDatabaseManager, SyncDatabaseManager>();
             services.AddTransient<ISenderManager, SenderManager>();
             services.AddTransient<IWeatherProcessor, WeatherProcessor>();
-            services.AddTransient<IFileManager, FileManager>();
             services.AddTransient<IEmailSender, EmailSender>();
 
             services.AddSingleton<ITaskCollection, TaskCollection>();
