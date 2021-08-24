@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
 using BL.Managers.Interfaces;
 using Entities.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Task_Manager.DTO;

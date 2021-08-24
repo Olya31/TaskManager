@@ -13,7 +13,7 @@ namespace BL.Managers.Interfaces
 
         Task<int> UpdateAsync(TaskModel task, CancellationToken token);
 
-        Task<List<TaskModel>> GetAllTaskAsync(CancellationToken token);
+        Task<IEnumerable<TaskModel>> GetAllTaskAsync(CancellationToken token);
 
         Task<TaskModel> GetTaskByIdAsync(int id, CancellationToken token);
     }

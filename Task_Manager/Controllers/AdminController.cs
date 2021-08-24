@@ -5,10 +5,9 @@ using System.Linq;
 
 namespace Task_Manager.Controllers
 {
-    [Route("api/admin")]
- 
+    [Route("api/admin")] 
     [ApiController]
-    [System.Web.Http.Authorize(Roles = "Administration")]
+    [System.Web.Http.Authorize(Roles = "Administrator")]
     public class AdminController : ControllerBase
     {
         private readonly UserManager<User> _userManager;

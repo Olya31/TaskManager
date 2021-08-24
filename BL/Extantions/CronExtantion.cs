@@ -28,7 +28,6 @@ namespace BL.Extantions
             return cronModel;
         }
 
-
         private static TimeSpan ConvertToMinutes(string str)
         {
             if (int.TryParse(str, out var minutes))

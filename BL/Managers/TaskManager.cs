@@ -27,9 +27,9 @@ namespace BL.Managers
             var sqlExpression = String.Format(
                 "INSERT INTO Tasks " +
                 "(Name, Description, Url, CronFormat, Email, Header)" +
-                " VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')", 
-                task.Name, 
-                task.Description, 
+                " VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}')",
+                task.Name,
+                task.Description,
                 task.Url,
                 task.CronFormat,
                 task.Email,
@@ -54,9 +54,9 @@ namespace BL.Managers
                 " CronFormat='{3}'," +
                 " Email='{4}'," +
                 " Header='{5}'" +
-                " WHERE Id='{6}'", 
-                task.Name, 
-                task.Description, 
+                " WHERE Id='{6}'",
+                task.Name,
+                task.Description,
                 task.Url,
                 task.CronFormat,
                 task.Email,
@@ -70,52 +70,6 @@ namespace BL.Managers
         {
             var sqlExpression = String.Format("SELECT * FROM Tasks WHERE Id='{0}'", id);
             var task = new TaskModel(0, "", "", "", "", "", "");
-            using (var connection = new SqliteConnection(connectionDb))
-            {
-                await connection.OpenAsync(token);
-                var command = new SqliteCommand(sqlExpression, connection);
-                try
-                {
-                    using (SqliteDataReader reader = await command.ExecuteReaderAsync(token))
-                    {
-                        if (reader.HasRows)
-                        {
-                            while (reader.Read())
-                            {
-                                try
-                                {
-                                    var Id = reader.GetInt32(0);
-                                    var Name = reader.GetString(1);
-                                    var Description = reader.GetString(2);
-                                    var Url = reader.GetString(3);
-                                    var CronFormat = reader.GetString(4);
-                                    var Email = reader.GetString(5);
-                                    var Header = reader.GetString(6);
-                                    var taskItem = new TaskModel(Id, Name, Description, Url, CronFormat, Email, Header);
-                                    task = taskItem;
-                                }
-                                catch (Exception ex)
-                                {
-                                    throw new Exception();
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception();
-                }
-
-            }
-
-            return task;
-        }
-
-        public async Task<List<TaskModel>> GetAllTaskAsync(CancellationToken token)
-        {
-            string sqlExpression = "SELECT * FROM Tasks";
-            List<TaskModel> tasks = new List<TaskModel>();
 
             using (var connection = new SqliteConnection(connectionDb))
             {
@@ -128,22 +82,50 @@ namespace BL.Managers
                     {
                         while (reader.Read())
                         {
-                            try
-                            {
-                                var Id = reader.GetInt32(0);
-                                var Name = reader.GetString(1);
-                                var Description = reader.GetString(2);
-                                var Url = reader.GetString(3);
-                                var CronFormat = reader.GetString(4);
-                                var Email = reader.GetString(5);
-                                var Header = reader.GetString(6);
-                                var task = new TaskModel(Id, Name, Description, Url, CronFormat, Email, Header);
-                                tasks.Add(task);
-                            }
-                            catch (Exception ex)
-                            {
-                                throw;
-                            }
+
+                            var Id = reader.GetInt32(0);
+                            var Name = reader.GetString(1);
+                            var Description = reader.GetString(2);
+                            var Url = reader.GetString(3);
+                            var CronFormat = reader.GetString(4);
+                            var Email = reader.GetString(5);
+                            var Header = reader.GetString(6);
+                            var taskItem = new TaskModel(Id, Name, Description, Url, CronFormat, Email, Header);
+                            task = taskItem;
+
+                        }
+                    }
+                }
+            }
+
+            return task;
+        }
+
+        public async Task<IEnumerable<TaskModel>> GetAllTaskAsync(CancellationToken token)
+        {
+            string sqlExpression = "SELECT * FROM Tasks";
+            var tasks = new List<TaskModel>();
+
+            using (var connection = new SqliteConnection(connectionDb))
+            {
+                await connection.OpenAsync(token);
+                var command = new SqliteCommand(sqlExpression, connection);
+
+                using (SqliteDataReader reader = await command.ExecuteReaderAsync(token))
+                {
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            var Id = reader.GetInt32(0);
+                            var Name = reader.GetString(1);
+                            var Description = reader.GetString(2);
+                            var Url = reader.GetString(3);
+                            var CronFormat = reader.GetString(4);
+                            var Email = reader.GetString(5);
+                            var Header = reader.GetString(6);
+                            var task = new TaskModel(Id, Name, Description, Url, CronFormat, Email, Header);
+                            tasks.Add(task);
                         }
                     }
                 }
@@ -154,20 +136,13 @@ namespace BL.Managers
 
         private async Task<int> GetConnectionAsync(string sqlExpression, CancellationToken token)
         {
-            try
+            using (var connection = new SqliteConnection(connectionDb))
             {
-                using (var connection = new SqliteConnection(connectionDb))
-                {
-                    await connection.OpenAsync(token);
-                    var command = new SqliteCommand(sqlExpression, connection);
-                    return command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception();
-            }
+                await connection.OpenAsync(token);
+                var command = new SqliteCommand(sqlExpression, connection);
 
+                return command.ExecuteNonQuery();
+            }
         }
     }
 }

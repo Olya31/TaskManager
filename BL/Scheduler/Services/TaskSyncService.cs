@@ -1,5 +1,4 @@
-﻿using BL.Scheduler.Managers;
-using BL.Scheduler.Managers.Interfaces;
+﻿using BL.Scheduler.Managers.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
