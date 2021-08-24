@@ -8,11 +8,11 @@ namespace BL.Scheduler.Managers
 {
     public sealed class SchedulerManager
     {
+        public bool IsRunning;
+
         private readonly CancellationTokenSource _cancellationTokenSource;
         private Task _task;
         private JobModel _job;
-
-        public Task JobTask => _task;
 
         public SchedulerManager(JobModel job)
         {
@@ -62,6 +62,8 @@ namespace BL.Scheduler.Managers
             SemaphoreSlim semaphoreSlim,
             CancellationToken cancellationToken)
         {
+            IsRunning = true;
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 try

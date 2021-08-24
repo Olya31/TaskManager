@@ -37,7 +37,7 @@ namespace BL.Scheduler.Managers
 
             foreach (var job in _jobs)
             {
-                if (job.Value.JobTask.Status == TaskStatus.Created)
+                if (!job.Value.IsRunning)
                 {
                     job.Value.Start(_senderManager, ss, token);
                 }
